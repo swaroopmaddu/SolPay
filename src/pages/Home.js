@@ -2,7 +2,7 @@ import { Button, Typography } from "@mui/material";
 import { Fragment } from "react";
 
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-import { encodeURL, createQR, findTransactionSignature, validateTransactionSignature } from '@solana/pay';
+import { encodeURL, createQR, findTransactionSignature, validateTransactionSignature, FindTransactionSignatureError } from '@solana/pay';
 import BigNumber from 'bignumber.js';
 import { simulateWalletInteraction } from "../utils/simulateWalletInteraction";
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -24,8 +24,8 @@ function Home() {
         // Simulate a checkout experience
          
         console.log('2. 🛍 Simulate a customer checkout \n');
-        const recipient = new PublicKey("EP8YfUCpbbLVL3zZUZmDWPboFSjpYaSUYYXKc2HRjft9");
-        const amount = new BigNumber(0.001);
+        const merchant = new PublicKey("EP8YfUCpbbLVL3zZUZmDWPboFSjpYaSUYYXKc2HRjft9");
+        const amount = new BigNumber(0.01);
         const reference = new Keypair().publicKey;
         const label = 'Jungle Cats store';
         const message = 'Jungle Cats store - your order - #001234';
@@ -34,7 +34,7 @@ function Home() {
         // Create a payment request link
         
         console.log('3. 💰 Create a payment request link \n');
-        const url = encodeURL({ recipient, amount, reference, label, message, memo });
+        const url = encodeURL({ recipient: merchant, amount, reference, label, message, memo });
 
         // encode URL in QR code
         const qrCode = createQR(url);
@@ -51,7 +51,6 @@ function Home() {
         console.log('4. 🔐 Simulate wallet interaction \n');
         await simulateWalletInteraction(connection, url, sendTransaction);
 
-
         /**
          * Wait for payment to be confirmed
          *
@@ -60,7 +59,35 @@ function Home() {
          * Important to note that we can only find the transaction when it's **confirmed**
          */
         console.log('\n5. Find the transaction');
-        const signatureInfo = await findTransactionSignature(connection, reference, undefined, 'confirmed');
+        let signatureInfo;
+        const { signature } = await new Promise((resolve, reject) => {
+            /**
+             * Retry until we find the transaction
+             *
+             * If a transaction with the given reference can't be found, the `findTransactionSignature`
+             * function will throw an error. There are a few reasons why this could be a false negative:
+             *
+             * - Transaction is not yet confirmed
+             * - Customer is yet to approve/complete the transaction
+             *
+             * You can implement a polling strategy to query for the transaction periodically.
+             */
+            const interval = setInterval(async () => {
+                console.count('Checking for transaction...');
+                try {
+                    signatureInfo = await findTransactionSignature(connection, reference, undefined, 'confirmed');
+                    console.log('\n 🖌  Signature found: ', signatureInfo.signature);
+                    clearInterval(interval);
+                    resolve(signatureInfo);
+                } catch (error) {
+                    if (!(error instanceof FindTransactionSignatureError)) {
+                        console.error(error);
+                        clearInterval(interval);
+                        reject(error);
+                    }
+                }
+            }, 1000);
+        });
 
         // Update payment status
         paymentStatus = 'confirmed';
@@ -77,10 +104,9 @@ function Home() {
          * found matches the transaction that you expected.
          */
         console.log('\n6. 🔗 Validate transaction \n');
-        const amountInLamports = amount.times(LAMPORTS_PER_SOL).integerValue(BigNumber.ROUND_FLOOR);
-
+        
         try {
-            await validateTransactionSignature(connection, signatureInfo, recipient, amountInLamports, undefined, reference);
+            await validateTransactionSignature(connection, signature, merchant, amount, undefined, reference);
 
             // Update payment status
             paymentStatus = 'validated';

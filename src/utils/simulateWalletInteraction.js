@@ -1,4 +1,4 @@
-import { PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { parseURL, createTransaction } from '@solana/pay';
 
 export async function simulateWalletInteraction(connection, url, sendTransaction) {
