@@ -7,6 +7,7 @@ import Link from '@mui/material/Link';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
+
 function NavigationBar() {
     return (
         <React.Fragment>
@@ -15,7 +16,7 @@ function NavigationBar() {
             <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }} >
                 <Toolbar sx={{ flexWrap: 'wrap' }}>
                     <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-                        <Link href='/' variant="h6" color="inherit" noWrap sx={{textDecoration:'none'}}> Solana Starter </Link>
+                        <Link href='/' variant="h6" color="inherit" noWrap sx={{textDecoration:'none'}}> Solana Pay Starter </Link>
                     </Typography>
                     <nav>
                         <Link variant="button" color="text.primary" href="airdrop" sx={{ my: 1, mx: 1.5 }} > Airdrop </Link>

@@ -1,7 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import { Fragment } from "react";
-
-import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { encodeURL, createQR, findTransactionSignature, validateTransactionSignature, FindTransactionSignatureError } from '@solana/pay';
 import BigNumber from 'bignumber.js';
 import { simulateWalletInteraction } from "../utils/simulateWalletInteraction";
@@ -35,7 +34,7 @@ function Home() {
         
         console.log('3. 💰 Create a payment request link \n');
         const url = encodeURL({ recipient: merchant, amount, reference, label, message, memo });
-
+        
         // encode URL in QR code
         const qrCode = createQR(url);
 
@@ -120,7 +119,7 @@ function Home() {
 
     return (
         <Fragment>
-            <Typography variant="h1">Sol Starter</Typography>
+            <Typography variant="h1">Solana Pay</Typography>
             <Button variant="contained" color="primary" onClick={main}>Checkout using Solana Pay</Button>
             <div id="qr-code" />
         </Fragment>

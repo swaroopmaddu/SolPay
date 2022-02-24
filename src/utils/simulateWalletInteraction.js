@@ -32,8 +32,7 @@ export async function simulateWalletInteraction(connection, url, sendTransaction
         console.log('Transaction: ', tx);
 
         /** * Send the transaction to the network */
-        const signature = await sendTransaction(tx, connection);
-        await connection.confirmTransaction(signature, 'confirmed');
+         await sendTransaction(tx, connection);
         console.log('✅ Transaction sent');
     } catch (error) {
         console.error('❌ Transaction creation failed', error);
