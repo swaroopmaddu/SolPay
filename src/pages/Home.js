@@ -1,24 +1,23 @@
 import { Button, Typography } from "@mui/material";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { clusterApiUrl, Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { encodeURL, createQR, findTransactionSignature, validateTransactionSignature, FindTransactionSignatureError } from '@solana/pay';
 import BigNumber from 'bignumber.js';
-import { simulateWalletInteraction } from "../utils/simulateWalletInteraction";
+import { sendWebTransactionRequest } from "../utils/sendWebTransactionRequest";
 import { useWallet } from '@solana/wallet-adapter-react';
 
 function Home() {
 
     const { publicKey, sendTransaction } = useWallet();
+    const [url, setUrl ] = useState('');
+
+    // Connecting to devnet for this example
+    console.log('1. ✅ Establish connection to the network');
+    const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 
     async function main() {
         // Variable to keep state of the payment status
         let paymentStatus;
-
-        // Connecting to devnet for this example
-        console.log('1. ✅ Establish connection to the network');
-        const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
-        const version = await connection.getVersion();
-        console.log('Connection to cluster established:', "devnet  ", version);
 
         // Simulate a checkout experience
          
@@ -34,21 +33,16 @@ function Home() {
         
         console.log('3. 💰 Create a payment request link \n');
         const url = encodeURL({ recipient: merchant, amount, reference, label, message, memo });
-        
+        setUrl(url);
         // encode URL in QR code
         const qrCode = createQR(url);
 
         // get a handle of the element
         const element = document.getElementById('qr-code');
-
+        
         // append QR code to the element
         qrCode.append(element);
-
         // -- snippet -- //
-
-        // Simulate wallet interaction
-        console.log('4. 🔐 Simulate wallet interaction \n');
-        await simulateWalletInteraction(connection, url, sendTransaction);
 
         /**
          * Wait for payment to be confirmed
@@ -117,11 +111,21 @@ function Home() {
         }
     }
 
+    async function useWebWallet() {
+        console.log('4. 🔐 Simulate wallet interaction \n');
+        await sendWebTransactionRequest(connection, url, sendTransaction);
+    }
+
     return (
         <Fragment>
             <Typography variant="h1">Solana Pay</Typography>
             <Button variant="contained" color="primary" onClick={main}>Checkout using Solana Pay</Button>
             <div id="qr-code" />
+
+           {url && <div id="buttons" style={{ display:'flex', justifyContent:'space-around' }}>
+                <Button variant="contained" color="primary" onClick={useWebWallet }>Pay with Web Wallet</Button>
+                <Button variant="contained" color="primary" onClick={() => { } }>Pay with Mobile Wallet</Button>
+            </div> }
         </Fragment>
     );
 }
