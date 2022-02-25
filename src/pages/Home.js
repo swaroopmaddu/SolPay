@@ -124,7 +124,7 @@ function Home() {
 
            {url && <div id="buttons" style={{ display:'flex', justifyContent:'space-around' }}>
                 <Button variant="contained" color="primary" onClick={useWebWallet }>Pay with Web Wallet</Button>
-                <Button variant="contained" color="primary" onClick={() => { } }>Pay with Mobile Wallet</Button>
+                <Button variant="contained" color="primary" onClick={() => window.open(url, "_blank") }>Pay with Mobile Wallet</Button>
             </div> }
         </Fragment>
     );
