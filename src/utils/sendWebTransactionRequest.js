@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { parseURL, createTransaction } from '@solana/pay';
 
-export async function sendWebTransactionRequest(connection, url, sendTransaction) {
+export async function sendWebTransactionRequest(connection, url, sendTransaction,publicKey) {
     /**
      * For example only
      *
@@ -16,7 +16,7 @@ export async function sendWebTransactionRequest(connection, url, sendTransaction
     console.log('amount: ', amount);
     console.log('Reference: ', reference);
     console.log('Recipient: ', recipient);
-    const payer = new PublicKey(window.solana.publicKey.toString());
+    const payer = new PublicKey(publicKey.toString());
     console.log('Payer',payer);
 
     /** * Create the transaction with the parameters decoded from the URL */

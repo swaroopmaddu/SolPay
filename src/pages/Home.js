@@ -22,7 +22,7 @@ function Home() {
         // Simulate a checkout experience
          
         console.log('2. 🛍 Simulate a customer checkout \n');
-        const merchant = new PublicKey("EP8YfUCpbbLVL3zZUZmDWPboFSjpYaSUYYXKc2HRjft9");
+        const merchant = new PublicKey("GzX7smLjNhntaWXKNXrWn4CbsjaCkhoGcfFNpJuY8WSs");
         const amount = new BigNumber(0.01);
         const reference = new Keypair().publicKey;
         const label = 'Jungle Cats store';
@@ -113,7 +113,13 @@ function Home() {
 
     async function useWebWallet() {
         console.log('4. 🔐 Simulate wallet interaction \n');
-        await sendWebTransactionRequest(connection, url, sendTransaction);
+        await sendWebTransactionRequest(connection, url, sendTransaction, publicKey);
+    }
+
+    function openAppWallet() {
+        window.location.replace(url); setTimeout(function () {
+            window.location.replace("https://apps.apple.com/us/app/phantom-solana-wallet/1598432977");
+        }, 2000);
     }
 
     return (
@@ -124,7 +130,7 @@ function Home() {
 
            {url && <div id="buttons" style={{ display:'flex', justifyContent:'space-around' }}>
                 <Button variant="contained" color="primary" onClick={useWebWallet }>Pay with Web Wallet</Button>
-                <Button variant="contained" color="primary" onClick={() => window.open(url, "_blank") }>Pay with Mobile Wallet</Button>
+                <Button variant="contained" color="primary" onClick={openAppWallet }>Pay with Mobile Wallet</Button>
             </div> }
         </Fragment>
     );
